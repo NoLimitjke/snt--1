@@ -4,6 +4,13 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { ChevronDown, FileText, Shield, MessageSquare, HelpCircle } from 'lucide-react'
 
 interface Session {
   user: {
@@ -60,6 +67,47 @@ export function Header() {
             >
               Главная
             </Link>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-green-600">
+                  Информация
+                  <ChevronDown className="h-3 w-3" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href="/legal" className="flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Правовая информация
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/ustav" className="flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Устав СНТ
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/privacy" className="flex items-center gap-2">
+                    <Shield className="h-4 w-4" />
+                    Политика ПДн
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/questions" className="flex items-center gap-2">
+                    <MessageSquare className="h-4 w-4" />
+                    Вопросы и обращения
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/faq" className="flex items-center gap-2">
+                    <HelpCircle className="h-4 w-4" />
+                    FAQ
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {isAdmin && (
               <Link

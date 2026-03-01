@@ -197,7 +197,7 @@ export async function getCommentsByPostId(
 ): Promise<CommentWithReplies[]> {
   const databases = getDatabases(apiKey)
 
-  const queries: any[] = [
+  const queries: string[] = [
     Query.equal('postId', postId),
     Query.orderAsc('$createdAt'),
   ]

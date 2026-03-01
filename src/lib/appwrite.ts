@@ -25,6 +25,7 @@ export const COLLECTIONS = {
   COMMENTS: 'comments',
   LIKES: 'likes',
   SESSIONS: 'sessions',
+  QUESTIONS: 'questions',
 } as const
 
 // ID базы данных (нужно создать в консоли Appwrite)
@@ -43,4 +44,7 @@ export const Permissions = {
   writeUser: (userId: string) => Permission.write(Role.user(userId)),
   // Читать может только конкретный пользователь
   readUser: (userId: string) => Permission.read(Role.user(userId)),
+  // Права для сессий - читать/писать может только владелец сессии
+  readSession: (userId: string) => Permission.read(Role.user(userId)),
+  writeSession: (userId: string) => Permission.write(Role.user(userId)),
 }

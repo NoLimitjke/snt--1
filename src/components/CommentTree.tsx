@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Heart, Reply } from 'lucide-react'
 import { format } from 'date-fns'
 import { ru } from 'date-fns/locale'
+import type { AuthSession } from '@/types'
 
 interface Comment {
   $id: string
@@ -23,7 +24,7 @@ interface Comment {
 interface CommentTreeProps {
   comments: Comment[]
   postId: string
-  session: any
+  session: AuthSession | null
 }
 
 function formatDate(dateString: string): string {

@@ -74,10 +74,10 @@ export async function POST(request: NextRequest) {
       name: user.name,
       role: user.role,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Login error:', error)
 
-    if (error.code === 401) {
+    if (typeof error === 'object' && error !== null && 'code' in error && (error as { code: number }).code === 401) {
       return NextResponse.json(
         { error: 'Неверный email или пароль' },
         { status: 401 }

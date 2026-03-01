@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Logout error:', error)
     return NextResponse.json(
       { error: 'Ошибка при выходе' },

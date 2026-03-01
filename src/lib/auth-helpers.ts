@@ -1,7 +1,7 @@
 import { headers } from 'next/headers'
 import { cookies } from 'next/headers'
-import { Client, Account, Databases, Query, Models } from 'node-appwrite'
-import { DATABASE_ID, COLLECTIONS, getServerClient } from '@/lib/appwrite'
+import { Client, Account, Databases, Query, Models, ID, Permission, Role } from 'node-appwrite'
+import { DATABASE_ID, COLLECTIONS, getServerClient, Permissions } from '@/lib/appwrite'
 import type { User } from '@/services/users'
 
 export interface Session {
@@ -50,26 +50,29 @@ export async function getSession(): Promise<Session | null> {
       return null
     }
 
-    // Получаем сессию из базы данных
+    // Получаем сессию из базы данных используя API ключ
     const apiKey = getApiKey()
     const client = getServerClient(apiKey)
     const databases = new Databases(client)
 
+    // Ищем сессию по токену без фильтрации по дате (фильтруем вручную)
     const sessions = await databases.listDocuments<SessionDocument>(
       DATABASE_ID,
       COLLECTIONS.SESSIONS,
-      [
-        Query.equal('token', sessionCookie.value),
-        Query.greaterThan('expiresAt', new Date().toISOString()),
-        Query.limit(1),
-      ]
+      [Query.equal('token', sessionCookie.value), Query.limit(100)]
     )
 
     if (sessions.documents.length === 0) {
       return null
     }
 
-    const sessionDoc = sessions.documents[0]
+    // Находим валидную сессию с неистекшим сроком
+    const now = new Date().toISOString()
+    const sessionDoc = sessions.documents.find(s => s.expiresAt > now)
+
+    if (!sessionDoc) {
+      return null
+    }
 
     // Получаем пользователя
     const user = await databases.getDocument<User>(
@@ -87,7 +90,7 @@ export async function getSession(): Promise<Session | null> {
         id: user.$id,
         email: user.email,
         name: user.name,
-        role: user.role,
+        role: user.role as 'ADMIN' | 'USER',
         isBanned: user.isBanned,
       },
       expiresAt: sessionDoc.expiresAt,
@@ -176,14 +179,19 @@ export async function createSession(userId: string): Promise<string> {
   await databases.createDocument(
     DATABASE_ID,
     COLLECTIONS.SESSIONS,
-    crypto.randomUUID(),
+    ID.unique(),
     {
       userId,
       token,
       expiresAt: expiresAt.toISOString(),
       ipAddress: null,
       userAgent: null,
-    }
+    },
+    [
+      Permissions.readSession(userId),
+      Permissions.writeSession(userId),
+      Permissions.readAny, // Разрешаем чтение серверу
+    ]
   )
 
   return token

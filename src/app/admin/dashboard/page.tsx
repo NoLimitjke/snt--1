@@ -12,16 +12,17 @@ export default function DashboardPage() {
   const [stats, setStats] = useState({
     users: 0,
     posts: 0,
-    comments: 0,
+    questions: 0,
   })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [usersRes, postsRes] = await Promise.all([
+        const [usersRes, postsRes, questionsRes] = await Promise.all([
           fetch('/api/admin/users?limit=1'),
           fetch('/api/admin/posts?limit=1'),
+          fetch('/api/questions?limit=1'),
         ])
 
         if (usersRes.ok) {
@@ -32,6 +33,11 @@ export default function DashboardPage() {
         if (postsRes.ok) {
           const postsData = await postsRes.json()
           setStats((prev) => ({ ...prev, posts: postsData.total }))
+        }
+
+        if (questionsRes.ok) {
+          const questionsData = await questionsRes.json()
+          setStats((prev) => ({ ...prev, questions: questionsData.total }))
         }
       } catch (error) {
         console.error('Error fetching stats:', error)
@@ -99,21 +105,61 @@ export default function DashboardPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Быстрые действия
+                  Вопросы
                 </CardTitle>
-                <Plus className="h-4 w-4 text-muted-foreground" />
+                <MessageSquare className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <Link href="/admin/posts">
-                  <Button variant="green" className="w-full">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Создать пост
+                <div className="text-2xl font-bold">{stats.questions}</div>
+                <Link href="/admin/questions">
+                  <Button variant="link" className="h-auto p-0 text-sm">
+                    Управление →
                   </Button>
                 </Link>
               </CardContent>
             </Card>
           </div>
         )}
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium">
+              Быстрые действия
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Link href="/admin/posts">
+              <Button variant="green" className="w-full">
+                <Plus className="mr-2 h-4 w-4" />
+                Создать пост
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium">
+              Правовая информация
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Link href="/legal" className="block">
+              <Button variant="outline" className="w-full justify-start">
+                <FileText className="mr-2 h-4 w-4" />
+                Правовая информация
+              </Button>
+            </Link>
+            <Link href="/admin/questions" className="block">
+              <Button variant="outline" className="w-full justify-start">
+                <MessageSquare className="mr-2 h-4 w-4" />
+                Вопросы и обращения
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

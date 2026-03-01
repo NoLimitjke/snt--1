@@ -12,6 +12,13 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Heart, MessageCircle, ArrowLeft } from 'lucide-react'
 import { format } from 'date-fns'
 import { ru } from 'date-fns/locale'
+import type { AuthSession } from '@/types'
+import type { PostWithCounts } from '@/services/posts'
+import type { CommentWithReplies } from '@/services/comments'
+
+interface PostWithComments extends PostWithCounts {
+  comments: CommentWithReplies[]
+}
 
 function formatDate(dateString: string): string {
   try {
@@ -41,8 +48,8 @@ function getTagVariant(tag: string) {
 function PostContent() {
   const params = useParams()
   const router = useRouter()
-  const [post, setPost] = useState<any>(null)
-  const [session, setSession] = useState<any>(null)
+  const [post, setPost] = useState<PostWithComments | null>(null)
+  const [session, setSession] = useState<AuthSession | null>(null)
   const [loading, setLoading] = useState(true)
   const [liked, setLiked] = useState(false)
   const [likesCount, setLikesCount] = useState(0)

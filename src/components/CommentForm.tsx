@@ -4,10 +4,11 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useRouter } from 'next/navigation'
+import type { AuthSession } from '@/types'
 
 interface CommentFormProps {
   postId: string
-  session: any
+  session: AuthSession | null
 }
 
 export function CommentForm({ postId, session }: CommentFormProps) {
